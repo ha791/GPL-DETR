@@ -1,0 +1,118 @@
+
+task: detect  # (str) YOLO task, i.e. detect, segment, classify, pose
+mode: train  # (str) YOLO mode, i.e. train, val, predict, export, track, benchmark
+
+# Train settings -------------------------------------------------------------------------------------------------------
+model:  
+data:  
+epochs: 100 
+patience: 0  
+batch: 8  
+imgsz: 640  
+save: True 
+save_period: -1 
+cache: False  
+device:  # (int | str | list, optional) device to run on, i.e. cuda device=0 or device=0,1,2,3 or device=cpu
+workers: 4  # (int) number of worker threads for data loading (per RANK if DDP)
+project: runs/train  # (str, optional) project name
+name: exp # (str, optional) experiment name, results saved to 'project/name' directory
+exist_ok: False  # (bool) whether to overwrite existing experiment
+pretrained: True  # (bool | str) whether to use a pretrained model (bool) or a model to load weights from (str)
+optimizer: AdamW  # (str) Manuscript optimizer: AdamW
+verbose: True  # (bool) whether to print verbose output
+seed: 0  # (int) Fixed random seed for full reproducibility, matches Manuscript Sec.3.2
+deterministic: True  # (bool) Enable deterministic mode to fix random number streams
+single_cls: False  # (bool) train multi‑class data as single‑class
+rect: False  # (bool) rectangular training if mode='train' or rectangular validation if mode='val'
+cos_lr: True  # (bool) Manuscript: Cosine annealing decay learning‑rate scheduler
+close_mosaic: 0  # (int) disable mosaic augmentation for final epochs (0 to disable)
+resume: False  # (bool) resume training from last checkpoint
+amp: False  # (bool) Automatic Mixed Precision (AMP) training
+fraction: 1.0  # (float) dataset fraction to train on (default is 1.0, all images in train set)
+profile: False  # (bool) profile ONNX and TensorRT speeds during training for loggers
+freeze: None  # (int | list, optional) freeze first n layers, or freeze list of layer indices during training
+
+# Segmentation
+overlap_mask: True  # (bool) masks should overlap during training (segment train only)
+mask_ratio: 4  # (int) mask downsample ratio (segment train only)
+
+# Classification
+dropout: 0.0  # (float) use dropout regularization (classify train only)
+
+# Val/Test settings ----------------------------------------------------------------------------------------------------
+val: True  # (bool) validate/test during training
+split: val  # (str) dataset split to use for validation, i.e. 'val', 'test' or 'train'
+save_json: True  # (bool) save coco‑format json results for computing mAP@50 / mAP@50:95
+save_hybrid: False  # (bool) save hybrid version of labels (labels + additional predictions)
+conf: 0.5  # (float) Manuscript inference confidence threshold =0.5
+iou: 0.7  # (float) IoU threshold for NMS
+max_det: 300  # (int) maximum number of detections per image
+half: False  # (bool) use half precision (FP16)
+dnn: False  # (bool) use OpenCV DNN for ONNX inference
+plots: True  # (bool) save plots during train/val
+
+# Prediction settings --------------------------------------------------------------------------------------------------
+source:  # (str, optional) source directory for images or videos
+show: False  # (bool) show results if possible
+save_txt: True  # (bool) export detection txt outputs for offline analysis
+save_conf: True  # (bool) save results with confidence scores
+save_crop: False  # (bool) save cropped images with results
+show_labels: True  # (bool) show object labels in plots
+show_conf: True  # (bool) show object confidence scores in plots
+vid_stride: 1  # (int) video frame‑rate stride
+stream_buffer: False  # (bool) buffer all streaming frames (True) or return the most recent frame (False)
+line_width:   # (int, optional) line width of the bounding boxes, auto if missing
+visualize: False  # (bool) visualize model features
+augment: False  # (bool) apply image augmentation to prediction sources
+agnostic_nms: False  # (bool) class‑agnostic NMS
+classes:  # (int | list[int], optional) filter results by class
+retina_masks: False  # (bool) use high‑resolution segmentation masks
+boxes: True  # (bool) Show boxes in segmentation predictions
+
+# Export settings ------------------------------------------------------------------------------------------------------
+format: torchscript  # (str) format to export to
+keras: False  # (bool) use Keras
+optimize: False  # (bool) TorchScript: optimize for mobile
+int8: False  # (bool) CoreML/TF INT8 quantization
+dynamic: False  # (bool) ONNX/TF/TensorRT: dynamic axes
+simplify: False  # (bool) ONNX: simplify model
+opset:  # (int, optional) ONNX: opset version
+workspace: 4  # (int) TensorRT: workspace size (GB)
+nms: False  # (bool) CoreML: add NMS
+
+# Hyperparameters ------------------------------------------------------------------------------------------------------
+lr0: 0.0001  # (float) Initial learning rate 1e‑4, matches Manuscript Table1
+lrf: 0.01  # (float) final learning rate factor for cosine annealing
+momentum: 0.9  # (float) AdamW beta1 =0.9
+weight_decay: 0.0001  # (float) weight‑decay coefficient 1e‑4
+warmup_epochs: 3  # (float) warmup epochs
+warmup_momentum: 0.8  # (float) warmup initial momentum
+warmup_bias_lr: 0.1  # (float) warmup initial bias lr
+box: 7.5  # (float) box loss gain
+cls: 0.5  # (float) cls loss gain
+dfl: 1.5  # (float) dfl loss gain
+pose: 12.0  # (float) pose loss gain
+kobj: 1.0  # (float) keypoint obj loss gain
+label_smoothing: 0.0  # (float) label smoothing (fraction)
+nbs: 64  # (int) nominal batch size
+
+# Augmentation (consistent with Manuscript Table1)
+hsv_h: 0.015  # (float) image HSV‑Hue augmentation
+hsv_s: 0.7  # (float) image HSV‑Saturation augmentation
+hsv_v: 0.4  # (float) image HSV‑Value augmentation
+degrees: 90.0  # (float) random rotation 0‑90°
+translate: 0.1  # (float) image translation
+scale: 0.5  # (float) mosaic scale range 0.5‑1.5
+shear: 0.0  # (float) image shear (+/‑ deg)
+perspective: 0.0  # (float) image perspective (+/‑ fraction)
+flipud: 0.0  # (float) image flip up‑down (probability)
+fliplr: 0.5  # (float) image flip left‑right (probability)
+mosaic: 1.0  # (float) enable mosaic augmentation
+mixup: 0.0  # (float) image mixup (probability)
+copy_paste: 0.0  # (float) segment copy‑paste (probability)
+
+# Custom config.yaml ---------------------------------------------------------------------------------------------------
+cfg:  # (str, optional) for overriding defaults.yaml
+
+# Tracker settings ------------------------------------------------------------------------------------------------------
+tracker: botsort.yaml  # (str) tracker type, choices=[botsort.yaml, bytetrack.yaml]
